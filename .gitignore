@@ -34,3 +34,26 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Payload CMS
+/media
+
+# Playwright
+/playwright-report
+/playwright/.cache
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# Logs
+pnpm-debug.log*
+*.log
+
+# Claude Code local settings
+.claude/settings*.json
+
+# pnpm build settings
+.pnpmbuildsettings.yaml
