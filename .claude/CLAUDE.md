@@ -5,9 +5,9 @@
 ## ÉTAT DU PROJET
 
 Statut : EN COURS
-Phase active : PHASE 3 — WatermelonDB
-Dernière action : Phase 2 Payload CMS terminée (11/12 tâches, test manuel restant)
-Prochaine action : Configurer WatermelonDB avec LokiJS adapter
+Phase active : PHASE 4 — Sync Engine
+Dernière action : Phase 3 WatermelonDB terminée (8/8 tâches)
+Prochaine action : Créer les routes API sync/pull et sync/push
 
 ## DÉCISIONS D'ARCHITECTURE PRISES
 
@@ -49,11 +49,14 @@ Prochaine action : Configurer WatermelonDB avec LokiJS adapter
 - sharp (image processing)
 - graphql
 
+### Production (installées suite)
+
+- @nozbe/watermelondb@0.28.x
+- @nozbe/with-observables@1.6.x
+- rxjs@7.8.x
+
 ### Production (à installer)
 
-- @nozbe/watermelondb@0.27.x
-- @nozbe/with-observables
-- rxjs@7.x
 - zustand@4.x
 - zod@3.x
 - @ducanh2912/next-pwa

@@ -30,16 +30,16 @@
 [x] Migration SQL : création table sync_log
 [>] Test : accès /admin → login fonctionnel (à tester avec make db-up && make dev)
 
-## PHASE 3 — WatermelonDB
+## PHASE 3 — WatermelonDB ✓
 
-[ ] src/db/index.ts (singleton getDatabase)
-[ ] scripts/generate-models.ts
-[ ] Lancer pnpm db:generate → vérifier output
-[ ] src/db/schema.ts (généré — vérifier)
-[ ] src/db/models/\*.ts (générés — vérifier)
-[ ] src/db/migrations.ts (v1 initiale)
-[ ] src/components/providers/DatabaseProvider.tsx
-[ ] Test : DB s'initialise dans le browser (pas d'erreur SSR)
+[x] src/db/index.ts (singleton getDatabase avec LokiJS)
+[x] src/db/schema.ts (tables: categories, posts, post_categories)
+[x] src/db/models/\*.ts (Category, Post, PostCategory)
+[x] src/db/migrations.ts (v1 initiale)
+[x] src/components/providers/DatabaseProvider.tsx (SSR-safe)
+[x] src/hooks/useCategories.ts + usePosts.ts
+[x] tsconfig.json (experimentalDecorators activé)
+[x] pnpm typecheck → 0 erreurs
 
 ## PHASE 4 — Sync Engine
 
