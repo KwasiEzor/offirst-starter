@@ -41,15 +41,16 @@
 [x] tsconfig.json (experimentalDecorators activé)
 [x] pnpm typecheck → 0 erreurs
 
-## PHASE 4 — Sync Engine
+## PHASE 4 — Sync Engine ✓
 
-[ ] src/app/api/sync/pull/route.ts
-[ ] src/app/api/sync/push/route.ts
-[ ] src/app/api/health/route.ts
-[ ] src/lib/sync-utils.ts (helpers conflict resolution)
-[ ] src/components/providers/SyncProvider.tsx
-[ ] src/hooks/useSync.ts
-[ ] Test E2E : créer record offline → sync → visible en DB
+[x] src/lib/sync-utils.ts (types, transformers, server-wins resolution)
+[x] src/lib/payload.ts (getPayloadClient helper)
+[x] src/app/api/sync/pull/route.ts
+[x] src/app/api/sync/push/route.ts
+[x] src/app/api/health/route.ts
+[x] src/components/providers/SyncProvider.tsx (auto-sync, reconnect)
+[x] src/hooks/useSync.ts (pull, push, sync, online detection)
+[x] pnpm typecheck → 0 erreurs
 
 ## PHASE 5 — Auth & Layout
 

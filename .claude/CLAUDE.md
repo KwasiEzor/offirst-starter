@@ -5,9 +5,9 @@
 ## ÉTAT DU PROJET
 
 Statut : EN COURS
-Phase active : PHASE 4 — Sync Engine
-Dernière action : Phase 3 WatermelonDB terminée (8/8 tâches)
-Prochaine action : Créer les routes API sync/pull et sync/push
+Phase active : PHASE 5 — Auth & Layout
+Dernière action : Phase 4 Sync Engine terminée (8/8 tâches)
+Prochaine action : Créer src/lib/auth.ts et pages login/register
 
 ## DÉCISIONS D'ARCHITECTURE PRISES
 

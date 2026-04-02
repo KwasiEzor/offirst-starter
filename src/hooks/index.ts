@@ -11,3 +11,5 @@ export {
   usePostBySlugQuery,
   useDirtyPostsQuery,
 } from './usePosts'
+
+export { useSync, type SyncStatus } from './useSync'
