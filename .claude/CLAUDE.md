@@ -5,9 +5,9 @@
 ## ÉTAT DU PROJET
 
 Statut : EN COURS
-Phase active : PHASE 5 — Auth & Layout
-Dernière action : Phase 4 Sync Engine terminée (8/8 tâches)
-Prochaine action : Créer src/lib/auth.ts et pages login/register
+Phase active : PHASE 6 — PWA
+Dernière action : Phase 5 Auth & Layout terminée (9/9 tâches)
+Prochaine action : Configurer PWA (manifest.json, icons, next-pwa)
 
 ## DÉCISIONS D'ARCHITECTURE PRISES
 

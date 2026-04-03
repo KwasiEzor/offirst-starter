@@ -52,17 +52,18 @@
 [x] src/hooks/useSync.ts (pull, push, sync, online detection)
 [x] pnpm typecheck → 0 erreurs
 
-## PHASE 5 — Auth & Layout
+## PHASE 5 — Auth & Layout ✓
 
-[ ] src/lib/auth.ts (getPayloadUser, requireAuth)
-[ ] src/app/(auth)/login/page.tsx
-[ ] src/app/(auth)/register/page.tsx (optionnel)
-[ ] src/app/(app)/layout.tsx (guard auth)
-[ ] src/components/layout/AppShell.tsx
-[ ] src/components/layout/Sidebar.tsx
-[ ] src/components/layout/Header.tsx
-[ ] src/app/(app)/dashboard/page.tsx (demo)
-[ ] Test : redirect si non auth, dashboard accessible si auth
+[x] src/lib/auth.ts (getPayloadUser, requireAuth, login, logout, register)
+[x] src/app/(auth)/login/page.tsx
+[x] src/app/(auth)/register/page.tsx
+[x] src/app/(app)/layout.tsx (guard auth)
+[x] src/components/layout/AppShell.tsx
+[x] src/components/layout/Sidebar.tsx
+[x] src/components/layout/Header.tsx
+[x] src/app/(app)/dashboard/page.tsx (demo)
+[x] pnpm typecheck → 0 erreurs
+[>] Test : redirect si non auth, dashboard accessible si auth (à tester avec make db-up && make dev)
 
 ## PHASE 6 — PWA
 
