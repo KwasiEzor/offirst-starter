@@ -59,6 +59,7 @@ export function useSync(): UseSyncReturn {
       const response = await fetch('/api/health', {
         method: 'GET',
         cache: 'no-store',
+        credentials: 'include',
       })
       const isOnline = response.ok
       setState(prev => ({ ...prev, isOnline }))
@@ -76,6 +77,7 @@ export function useSync(): UseSyncReturn {
     const response = await fetch('/api/sync/pull', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify({
         lastSyncedAt: state.lastSyncedAt,
         collections: SYNCABLE_COLLECTIONS,
@@ -196,6 +198,7 @@ export function useSync(): UseSyncReturn {
     const response = await fetch('/api/sync/push', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify({ changes }),
     })
 
