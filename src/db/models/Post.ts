@@ -1,11 +1,10 @@
-import { Model, Q } from '@nozbe/watermelondb'
+import { Model, Q, type Query } from '@nozbe/watermelondb'
 import {
   field,
   date,
   readonly,
   writer,
   children,
-  lazy,
 } from '@nozbe/watermelondb/decorators'
 
 import type PostCategory from './PostCategory'
@@ -40,9 +39,12 @@ export default class Post extends Model {
   // Relations
   @children('post_categories') postCategories!: PostCategory[]
 
-  @lazy categories = this.collections
-    .get<Category>('categories')
-    .query(Q.on('post_categories', 'post_id', this.id))
+  // Categories query (using getter instead of @lazy for Next.js compatibility)
+  get categories(): Query<Category> {
+    return this.collections
+      .get<Category>('categories')
+      .query(Q.on('post_categories', 'post_id', this.id))
+  }
 
   /**
    * Get parsed Lexical content
