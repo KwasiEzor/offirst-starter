@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 
-import { logout } from '@/lib/auth'
+import { logout } from '@/lib/auth-client'
 import { useSyncContext } from '@/components/providers'
 
 interface HeaderProps {

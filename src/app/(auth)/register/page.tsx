@@ -4,7 +4,7 @@ import { useState, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
-import { register, login } from '@/lib/auth'
+import { register, login } from '@/lib/auth-client'
 
 export default function RegisterPage() {
   const router = useRouter()
