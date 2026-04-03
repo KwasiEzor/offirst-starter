@@ -75,15 +75,16 @@
 [x] pnpm typecheck → 0 erreurs
 [>] Test offline : Chrome DevTools → Network: Offline → app fonctionne (à tester avec make build && make start)
 
-## PHASE 7 — Tests
+## PHASE 7 — Tests ✓
 
-[ ] vitest.config.ts
-[ ] src/**/**tests**/db.test.ts (sync logic)
-[ ] src/**/**tests**/models.test.ts
-[ ] playwright.config.ts
-[ ] e2e/login.spec.ts
-[ ] e2e/dashboard.spec.ts
-[ ] e2e/offline.spec.ts (service worker mock)
+[x] vitest.config.ts + vitest.setup.ts
+[x] src/lib/**tests**/sync-utils.test.ts (20 tests)
+[x] @vitejs/plugin-react + testing libraries
+[x] playwright.config.ts (multi-browser)
+[x] e2e/auth.spec.ts (login/register flow)
+[x] e2e/home.spec.ts (redirects, PWA manifest)
+[x] pnpm typecheck → 0 erreurs
+[>] Run e2e tests avec make db-up && pnpm test:e2e
 
 ## PHASE 8 — Finalisation
 

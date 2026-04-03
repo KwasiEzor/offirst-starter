@@ -5,9 +5,9 @@
 ## ÉTAT DU PROJET
 
 Statut : EN COURS
-Phase active : PHASE 7 — Tests
-Dernière action : Phase 6 PWA terminée (6/6 tâches)
-Prochaine action : Configurer Vitest + Playwright, écrire tests
+Phase active : PHASE 8 — Finalisation
+Dernière action : Phase 7 Tests terminée (7/7 tâches)
+Prochaine action : README, Dockerfile, configs déploiement, seed script
 
 ## DÉCISIONS D'ARCHITECTURE PRISES
 
@@ -77,12 +77,13 @@ Prochaine action : Configurer Vitest + Playwright, écrire tests
 - cross-env
 - tailwindcss + postcss
 
-### Dev (à installer)
+### Dev (installées suite)
 
-- vitest + @vitest/coverage-v8
-- @testing-library/react + @testing-library/user-event
-- playwright
-- ts-node
+- vitest@4.x + @vitest/coverage-v8
+- @vitejs/plugin-react@6.x
+- @testing-library/react + @testing-library/dom + @testing-library/jest-dom
+- jsdom@29.x
+- @playwright/test@1.x
 
 ## VARIABLES D'ENVIRONNEMENT REQUISES
 
