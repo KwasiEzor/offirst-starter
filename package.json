@@ -18,6 +18,7 @@
     "db:migrate:create": "pnpm payload migrate:create"
   },
   "dependencies": {
+    "@ducanh2912/next-pwa": "^10.2.9",
     "@nozbe/watermelondb": "^0.28.0",
     "@nozbe/with-observables": "^1.6.0",
     "@payloadcms/db-postgres": "^3.81.0",

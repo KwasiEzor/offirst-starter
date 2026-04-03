@@ -65,13 +65,15 @@
 [x] pnpm typecheck → 0 erreurs
 [>] Test : redirect si non auth, dashboard accessible si auth (à tester avec make db-up && make dev)
 
-## PHASE 6 — PWA
+## PHASE 6 — PWA ✓
 
-[ ] public/manifest.json
-[ ] public/icons/icon-192.png + icon-512.png
-[ ] Meta tags dans app/layout.tsx
-[ ] next-pwa configuration dans next.config.mjs
-[ ] Test offline : Chrome DevTools → Network: Offline → app fonctionne
+[x] public/manifest.json
+[x] public/icons/icon-192.png + icon-512.png
+[x] Meta tags dans app/layout.tsx (Metadata + Viewport)
+[x] next-pwa configuration dans next.config.mjs (runtimeCaching strategies)
+[x] .gitignore pour fichiers générés (sw.js, workbox-\*.js)
+[x] pnpm typecheck → 0 erreurs
+[>] Test offline : Chrome DevTools → Network: Offline → app fonctionne (à tester avec make build && make start)
 
 ## PHASE 7 — Tests
 

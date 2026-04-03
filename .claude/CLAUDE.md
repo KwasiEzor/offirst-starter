@@ -5,9 +5,9 @@
 ## ÉTAT DU PROJET
 
 Statut : EN COURS
-Phase active : PHASE 6 — PWA
-Dernière action : Phase 5 Auth & Layout terminée (9/9 tâches)
-Prochaine action : Configurer PWA (manifest.json, icons, next-pwa)
+Phase active : PHASE 7 — Tests
+Dernière action : Phase 6 PWA terminée (6/6 tâches)
+Prochaine action : Configurer Vitest + Playwright, écrire tests
 
 ## DÉCISIONS D'ARCHITECTURE PRISES
 
@@ -55,11 +55,14 @@ Prochaine action : Configurer PWA (manifest.json, icons, next-pwa)
 - @nozbe/with-observables@1.6.x
 - rxjs@7.8.x
 
+### Production (installées suite)
+
+- @ducanh2912/next-pwa@10.x
+
 ### Production (à installer)
 
 - zustand@4.x
 - zod@3.x
-- @ducanh2912/next-pwa
 - next-themes
 - pino + pino-pretty (logger)
 - geist (font)
