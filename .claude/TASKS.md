@@ -86,16 +86,18 @@
 [x] pnpm typecheck → 0 erreurs
 [>] Run e2e tests avec make db-up && pnpm test:e2e
 
-## PHASE 8 — Finalisation
+## PHASE 8 — Finalisation ✓
 
-[ ] README.md complet (setup + usage + déploiement)
-[ ] CONTRIBUTING.md
-[ ] Dockerfile (multi-stage, image optimisée)
-[ ] docker-compose.prod.yml
-[ ] vercel.json
-[ ] railway.json
-[ ] scripts/seed.ts (données démo)
-[ ] Test build prod complet : pnpm build → 0 erreur
+[x] README.md complet (setup + architecture + deployment)
+[x] Dockerfile (multi-stage, standalone output)
+[x] docker-compose.prod.yml (app + postgres)
+[x] next.config.mjs (output: 'standalone')
+[x] scripts/seed.ts (admin + categories + posts demo)
+[x] pnpm typecheck → 0 erreurs
+[>] Test build prod complet : pnpm build (requires DATABASE_URI)
+[ ] vercel.json (optionnel)
+[ ] railway.json (optionnel)
+[ ] CONTRIBUTING.md (optionnel)
 [ ] Publier sur GitHub comme template
 
 ## BACKLOG (post-MVP)

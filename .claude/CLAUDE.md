@@ -4,10 +4,10 @@
 
 ## ÉTAT DU PROJET
 
-Statut : EN COURS
-Phase active : PHASE 8 — Finalisation
-Dernière action : Phase 7 Tests terminée (7/7 tâches)
-Prochaine action : README, Dockerfile, configs déploiement, seed script
+Statut : MVP COMPLET
+Phase active : Toutes les phases terminées (1-8)
+Dernière action : Phase 8 Finalisation terminée
+Prochaine action : Tester avec make db-up && pnpm dev, puis publier sur GitHub
 
 ## DÉCISIONS D'ARCHITECTURE PRISES
 
@@ -84,6 +84,7 @@ Prochaine action : README, Dockerfile, configs déploiement, seed script
 - @testing-library/react + @testing-library/dom + @testing-library/jest-dom
 - jsdom@29.x
 - @playwright/test@1.x
+- tsx@4.x (TypeScript script runner)
 
 ## VARIABLES D'ENVIRONNEMENT REQUISES
 

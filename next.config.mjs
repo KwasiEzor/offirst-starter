@@ -69,6 +69,9 @@ const withPWA = withPWAInit({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Enable standalone output for Docker deployments
+  output: 'standalone',
+
   // WatermelonDB requires this to avoid bundling issues
   serverExternalPackages: ['@nozbe/watermelondb'],
 
