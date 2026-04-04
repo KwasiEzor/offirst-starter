@@ -67,7 +67,7 @@ Status: In progress
 
 - [x] Add integration tests for pull and push route behavior.
 - [x] Add tests for “create then update before pull”.
-- [ ] Add tests for missing-local-row upsert behavior.
+- [x] Add tests for missing-local-row upsert behavior.
 - [ ] Add tests for PWA/runtime caching exclusions where practical.
 
 ## Current Implementation Slice
@@ -90,3 +90,4 @@ The second implementation pass hardens the sync protocol itself:
 4. Persist server update timestamps locally and reject stale pushes instead of overwriting newer server edits.
 5. Add tests around sync cursor parsing, timestamp conflict checks, and event reduction behavior.
 6. Add route-level tests for pull compaction and push conflict rejection.
+7. Add client-side sync helper coverage for missing-local-row upserts and dirty-row preservation.

@@ -307,7 +307,7 @@ export function useSync(): UseSyncReturn {
 /**
  * Apply sync record data to WatermelonDB model
  */
-function applyRecordToModel(
+export function applyRecordToModel(
   model: Category | Post,
   record: SyncRecord,
   collection: SyncableCollection,
@@ -352,7 +352,7 @@ function applyRecordToModel(
   }
 }
 
-async function upsertServerRecord(
+export async function upsertServerRecord(
   table: Collection<Model>,
   record: SyncRecord,
   collection: SyncableCollection
