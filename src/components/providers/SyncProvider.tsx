@@ -5,6 +5,7 @@ import {
   useContext,
   useEffect,
   useCallback,
+  useRef,
   type ReactNode,
 } from 'react'
 
@@ -56,14 +57,15 @@ export function SyncProvider({
 }: SyncProviderProps) {
   const syncHook = useSync()
   const { sync, checkOnline, isOnline } = syncHook
+  const hasSyncedOnMount = useRef(false)
 
   // Sync on mount
   useEffect(() => {
-    if (syncOnMount) {
+    if (syncOnMount && !hasSyncedOnMount.current) {
+      hasSyncedOnMount.current = true
       sync()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [syncOnMount, sync])
 
   // Auto sync interval
   useEffect(() => {

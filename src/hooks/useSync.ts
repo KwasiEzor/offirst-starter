@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef } from 'react'
 import { useDatabase } from '@nozbe/watermelondb/react'
-import { Q, type Model } from '@nozbe/watermelondb'
+import { Q, type Collection, type Model } from '@nozbe/watermelondb'
 
 import type {
   SyncPullResponse,
@@ -97,38 +97,20 @@ export function useSync(): UseSyncReturn {
 
         // Handle created records
         for (const record of changes.created) {
-          const existing = await table
-            .query(Q.where('server_id', record.serverId as string))
-            .fetch()
-
-          if (existing.length === 0) {
-            await table.create((item: Model) => {
-              applyRecordToModel(
-                item as SyncModel,
-                record,
-                collection as SyncableCollection
-              )
-            })
-          }
+          await upsertServerRecord(
+            table,
+            record,
+            collection as SyncableCollection
+          )
         }
 
         // Handle updated records
         for (const record of changes.updated) {
-          const existing = await table
-            .query(Q.where('server_id', record.serverId as string))
-            .fetch()
-
-          if (existing.length > 0) {
-            const item = existing[0] as Category | Post
-            // Server wins - always apply server changes
-            await item.update((model: Category | Post) => {
-              applyRecordToModel(
-                model,
-                record,
-                collection as SyncableCollection
-              )
-            })
-          }
+          await upsertServerRecord(
+            table,
+            record,
+            collection as SyncableCollection
+          )
         }
 
         // Handle deleted records
@@ -335,6 +317,32 @@ function applyRecordToModel(
       ? new Date(record.published_at as number)
       : null
   }
+}
+
+async function upsertServerRecord(
+  table: Collection<Model>,
+  record: SyncRecord,
+  collection: SyncableCollection
+): Promise<void> {
+  const serverId = record.serverId as string | undefined
+
+  if (!serverId) {
+    return
+  }
+
+  const existing = await table.query(Q.where('server_id', serverId)).fetch()
+
+  if (existing.length === 0) {
+    await table.create((item: Model) => {
+      applyRecordToModel(item as SyncModel, record, collection)
+    })
+    return
+  }
+
+  const item = existing[0] as Category | Post
+  await item.update((model: Category | Post) => {
+    applyRecordToModel(model, record, collection)
+  })
 }
 
 /**

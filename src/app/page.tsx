@@ -2,6 +2,8 @@ import { redirect } from 'next/navigation'
 
 import { getPayloadUser } from '@/lib/auth'
 
+export const dynamic = 'force-dynamic'
+
 /**
  * Home page - redirects to dashboard if authenticated, login if not
  */

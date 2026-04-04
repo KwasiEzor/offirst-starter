@@ -1,0 +1,81 @@
+# Offirst Starter Improvement Plan
+
+Updated: 2026-04-04
+Owner: Codex review follow-up
+
+## Goals
+
+This plan is based on the latest code review and is ordered by production risk rather than UI polish.
+
+1. Make sync behavior correct and recoverable.
+2. Remove configuration that can break auth, caching, or quality gates in production.
+3. Tighten App Router boundaries and reduce unnecessary client work.
+4. Add the missing test coverage for the offline-first contract.
+
+## Findings Driving This Plan
+
+### Critical
+
+- Incremental sync can miss records permanently when a document is created and then updated before a client pulls.
+- Local dirty records can be overwritten during pull without any real timestamp-based reconciliation.
+
+### High
+
+- PWA runtime caching is too broad and can cache API and auth traffic.
+- The lint command is broken with the current Next.js and flat ESLint setup.
+
+### Medium
+
+- The app shell is more client-heavy than necessary.
+- The dashboard sync card is hardcoded and does not reflect live state.
+- Sync coverage is mostly utility-level and does not exercise the real pull/push flow.
+
+## Delivery Phases
+
+### Phase 1: Stabilize the Current Architecture
+
+Status: Partially complete
+
+- [x] Save a review-driven plan in the repository.
+- [x] Fix the lint command so CI and local checks are usable again.
+- [x] Tighten PWA caching to avoid caching API, auth, and admin traffic.
+- [x] Make client pull behavior upsert-safe so `updated` records are not dropped when missing locally.
+- [x] Dedupe sync-log driven fetches and make pull behavior more defensive.
+- [x] Fix App Router build blockers caused by build-time linting, `useSearchParams`, and auth-dependent prerendering.
+
+### Phase 2: Correct the Sync Protocol
+
+Status: Planned
+
+- [ ] Replace the current one-row-per-document sync log with append-only change events or an equivalent cursor-based approach.
+- [ ] Apply explicit conflict rules instead of the current “pull first and overwrite” behavior.
+- [ ] Persist and compare server and local update timestamps consistently.
+- [ ] Decide whether local-first edits should survive pull conflicts or whether the server must always win, then encode that in code and tests.
+
+### Phase 3: Reduce Client-Side Surface Area
+
+Status: Planned
+
+- [ ] Move as much of the authenticated shell back to server components as practical.
+- [ ] Keep only the database and sync boundaries client-side.
+- [ ] Remove redundant auth checks inside children already protected by the app layout.
+- [ ] Replace the hardcoded dashboard sync status with live data from sync state and local dirty counts.
+
+### Phase 4: Test the Real Contract
+
+Status: Planned
+
+- [ ] Add integration tests for pull and push route behavior.
+- [ ] Add tests for “create then update before pull”.
+- [ ] Add tests for missing-local-row upsert behavior.
+- [ ] Add tests for PWA/runtime caching exclusions where practical.
+
+## Current Implementation Slice
+
+The first implementation pass is intentionally narrow:
+
+1. Restore a working lint command.
+2. Remove the risky broad cache rule from the PWA configuration.
+3. Harden sync application logic so server updates upsert locally instead of being ignored.
+
+This improves production safety immediately without forcing a full sync protocol redesign in one change.

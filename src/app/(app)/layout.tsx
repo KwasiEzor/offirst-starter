@@ -3,6 +3,8 @@ import type { ReactNode } from 'react'
 import { requireAuth } from '@/lib/auth'
 import { AppShell } from '@/components/layout'
 
+export const dynamic = 'force-dynamic'
+
 interface AppLayoutProps {
   children: ReactNode
 }

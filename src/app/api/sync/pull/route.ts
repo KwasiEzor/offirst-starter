@@ -1,4 +1,4 @@
-import type { NextRequest} from 'next/server';
+import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 import { sql } from 'drizzle-orm'
 
@@ -66,29 +66,34 @@ export async function POST(request: NextRequest) {
         const syncLog = (syncLogResult.rows || []) as unknown as SyncLogRow[]
 
         // Group by operation
-        const createIds: string[] = []
-        const updateIds: string[] = []
-        const deleteIds: string[] = []
+        const createIds = new Set<string>()
+        const updateIds = new Set<string>()
+        const deleteIds = new Set<string>()
 
         for (const entry of syncLog) {
           switch (entry.operation) {
             case 'create':
-              createIds.push(entry.document_id)
+              createIds.add(entry.document_id)
+              deleteIds.delete(entry.document_id)
               break
             case 'update':
-              updateIds.push(entry.document_id)
+              if (!createIds.has(entry.document_id)) {
+                updateIds.add(entry.document_id)
+              }
               break
             case 'delete':
-              deleteIds.push(entry.document_id)
+              createIds.delete(entry.document_id)
+              updateIds.delete(entry.document_id)
+              deleteIds.add(entry.document_id)
               break
           }
         }
 
         // Fetch created documents
-        if (createIds.length > 0) {
+        if (createIds.size > 0) {
           const created = await payload.find({
             collection,
-            where: { id: { in: createIds } },
+            where: { id: { in: Array.from(createIds) } },
             limit: 1000,
           })
           changes[collection]!.created = created.docs.map(doc =>
@@ -97,10 +102,10 @@ export async function POST(request: NextRequest) {
         }
 
         // Fetch updated documents
-        if (updateIds.length > 0) {
+        if (updateIds.size > 0) {
           const updated = await payload.find({
             collection,
-            where: { id: { in: updateIds } },
+            where: { id: { in: Array.from(updateIds) } },
             limit: 1000,
           })
           changes[collection]!.updated = updated.docs.map(doc =>
@@ -109,7 +114,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Add deleted IDs
-        changes[collection]!.deleted = deleteIds
+        changes[collection]!.deleted = Array.from(deleteIds)
       } else {
         // Initial sync - fetch all documents
         const allDocs = await payload.find({

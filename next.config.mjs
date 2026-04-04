@@ -52,18 +52,6 @@ const withPWA = withPWAInit({
         },
       },
     },
-    {
-      urlPattern: /^https:\/\/.*$/i,
-      handler: 'NetworkFirst',
-      options: {
-        cacheName: 'others',
-        networkTimeoutSeconds: 10,
-        expiration: {
-          maxEntries: 32,
-          maxAgeSeconds: 24 * 60 * 60, // 1 day
-        },
-      },
-    },
   ],
 })
 
@@ -89,6 +77,11 @@ const nextConfig = {
 
   // Disable x-powered-by header for security
   poweredByHeader: false,
+
+  // Use the explicit `pnpm lint` script instead of Next's deprecated build-time lint path.
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 
   // Enable experimental features as needed
   experimental: {
