@@ -4,21 +4,19 @@ import { sql } from 'drizzle-orm'
 
 import { getPayloadClient } from '@/lib/payload'
 import {
+  getLatestSyncCursor,
+  reduceSyncLogRows,
+  type SyncLogRow,
+} from '@/lib/server/sync-log'
+import {
   type SyncPullRequest,
   type SyncPullResponse,
   SYNCABLE_COLLECTIONS,
   isSyncableCollection,
+  parseSyncCursor,
   payloadToWatermelon,
+  serializeSyncCursor,
 } from '@/lib/sync-utils'
-
-interface SyncLogRow {
-  id: number
-  collection: string
-  document_id: string
-  operation: 'create' | 'update' | 'delete'
-  timestamp: string
-  user_id: string | null
-}
 
 /**
  * POST /api/sync/pull
@@ -37,7 +35,13 @@ export async function POST(request: NextRequest) {
     }
 
     const body = (await request.json()) as SyncPullRequest
-    const { lastSyncedAt, collections = SYNCABLE_COLLECTIONS } = body
+    const {
+      cursor = null,
+      lastSyncedAt = null,
+      collections = SYNCABLE_COLLECTIONS,
+    } = body
+    const lastEventId = parseSyncCursor(cursor)
+    const latestCursor = await getLatestSyncCursor(payload.db)
 
     // Filter to only syncable collections
     const syncCollections = collections.filter(isSyncableCollection)
@@ -52,48 +56,37 @@ export async function POST(request: NextRequest) {
         deleted: [],
       }
 
-      if (lastSyncedAt) {
+      if (cursor || lastSyncedAt) {
         // Get changes from sync_log since last sync
         const syncLogResult = await payload.db.drizzle.execute(
-          sql`
-            SELECT * FROM sync_log
-            WHERE collection = ${collection}
-            AND timestamp > ${lastSyncedAt}
-            ORDER BY timestamp ASC
-          `
+          cursor
+            ? sql`
+                SELECT id, collection, document_id, operation, timestamp, user_id
+                FROM sync_log
+                WHERE collection = ${collection}
+                  AND id > ${lastEventId}
+                  AND id <= ${latestCursor}
+                ORDER BY id ASC
+              `
+            : sql`
+                SELECT id, collection, document_id, operation, timestamp, user_id
+                FROM sync_log
+                WHERE collection = ${collection}
+                  AND timestamp > ${lastSyncedAt}
+                  AND id <= ${latestCursor}
+                ORDER BY id ASC
+              `
         )
 
         const syncLog = (syncLogResult.rows || []) as unknown as SyncLogRow[]
-
-        // Group by operation
-        const createIds = new Set<string>()
-        const updateIds = new Set<string>()
-        const deleteIds = new Set<string>()
-
-        for (const entry of syncLog) {
-          switch (entry.operation) {
-            case 'create':
-              createIds.add(entry.document_id)
-              deleteIds.delete(entry.document_id)
-              break
-            case 'update':
-              if (!createIds.has(entry.document_id)) {
-                updateIds.add(entry.document_id)
-              }
-              break
-            case 'delete':
-              createIds.delete(entry.document_id)
-              updateIds.delete(entry.document_id)
-              deleteIds.add(entry.document_id)
-              break
-          }
-        }
+        const { createdIds, updatedIds, deletedIds } =
+          reduceSyncLogRows(syncLog)
 
         // Fetch created documents
-        if (createIds.size > 0) {
+        if (createdIds.length > 0) {
           const created = await payload.find({
             collection,
-            where: { id: { in: Array.from(createIds) } },
+            where: { id: { in: createdIds } },
             limit: 1000,
           })
           changes[collection]!.created = created.docs.map(doc =>
@@ -102,10 +95,10 @@ export async function POST(request: NextRequest) {
         }
 
         // Fetch updated documents
-        if (updateIds.size > 0) {
+        if (updatedIds.length > 0) {
           const updated = await payload.find({
             collection,
-            where: { id: { in: Array.from(updateIds) } },
+            where: { id: { in: updatedIds } },
             limit: 1000,
           })
           changes[collection]!.updated = updated.docs.map(doc =>
@@ -114,7 +107,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Add deleted IDs
-        changes[collection]!.deleted = Array.from(deleteIds)
+        changes[collection]!.deleted = deletedIds
       } else {
         // Initial sync - fetch all documents
         const allDocs = await payload.find({
@@ -131,6 +124,7 @@ export async function POST(request: NextRequest) {
 
     const response: SyncPullResponse = {
       changes,
+      cursor: serializeSyncCursor(latestCursor),
       timestamp,
     }
 

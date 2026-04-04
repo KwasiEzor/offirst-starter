@@ -1,47 +1,19 @@
-'use client'
-
 import type { ReactNode } from 'react'
 
-import { Header } from './Header'
-import { Sidebar } from './Sidebar'
-import { DatabaseProvider, SyncProvider } from '@/components/providers'
+import AppShellClient from './AppShellClient'
+import type { AuthUser } from '@/lib/auth-client'
 
 interface AppShellProps {
   children: ReactNode
-  user: {
-    id: string
-    email: string
-    name?: string | null
-  }
+  user: AuthUser
 }
 
 /**
- * Main application shell with header, sidebar, and content area
- * Includes DatabaseProvider and SyncProvider for offline-first functionality
+ * Server component wrapper around the authenticated app shell.
+ * Only the provider-driven shell chrome stays on the client.
  */
 export function AppShell({ children, user }: AppShellProps) {
-  return (
-    <DatabaseProvider
-      fallback={
-        <div className="flex min-h-screen items-center justify-center">
-          <div className="text-center">
-            <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
-            <p className="mt-2 text-sm text-gray-500">Loading database...</p>
-          </div>
-        </div>
-      }
-    >
-      <SyncProvider autoSyncInterval={30000} syncOnMount syncOnReconnect>
-        <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
-          <Sidebar />
-          <div className="flex flex-1 flex-col">
-            <Header user={user} />
-            <main className="flex-1 overflow-auto p-6">{children}</main>
-          </div>
-        </div>
-      </SyncProvider>
-    </DatabaseProvider>
-  )
+  return <AppShellClient user={user}>{children}</AppShellClient>
 }
 
 export default AppShell

@@ -21,6 +21,7 @@ export type SyncStatus = 'idle' | 'syncing' | 'success' | 'error' | 'offline'
 interface SyncState {
   status: SyncStatus
   lastSyncedAt: string | null
+  cursor: string | null
   error: string | null
   isOnline: boolean
 }
@@ -33,6 +34,7 @@ interface UseSyncReturn extends SyncState {
 }
 
 const LAST_SYNCED_KEY = 'offirst_last_synced_at'
+const SYNC_CURSOR_KEY = 'offirst_sync_cursor'
 
 /**
  * Hook for managing offline-first synchronization
@@ -44,6 +46,10 @@ export function useSync(): UseSyncReturn {
     lastSyncedAt:
       typeof window !== 'undefined'
         ? localStorage.getItem(LAST_SYNCED_KEY)
+        : null,
+    cursor:
+      typeof window !== 'undefined'
+        ? localStorage.getItem(SYNC_CURSOR_KEY)
         : null,
     error: null,
     isOnline: typeof navigator !== 'undefined' ? navigator.onLine : true,
@@ -79,7 +85,8 @@ export function useSync(): UseSyncReturn {
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
       body: JSON.stringify({
-        lastSyncedAt: state.lastSyncedAt,
+        cursor: state.cursor,
+        lastSyncedAt: state.cursor ? null : state.lastSyncedAt,
         collections: SYNCABLE_COLLECTIONS,
       }),
     })
@@ -128,8 +135,13 @@ export function useSync(): UseSyncReturn {
 
     // Update last synced timestamp
     localStorage.setItem(LAST_SYNCED_KEY, data.timestamp)
-    setState(prev => ({ ...prev, lastSyncedAt: data.timestamp }))
-  }, [database, state.lastSyncedAt])
+    localStorage.setItem(SYNC_CURSOR_KEY, data.cursor)
+    setState(prev => ({
+      ...prev,
+      lastSyncedAt: data.timestamp,
+      cursor: data.cursor,
+    }))
+  }, [database, state.cursor, state.lastSyncedAt])
 
   /**
    * Push local changes to server
@@ -192,6 +204,7 @@ export function useSync(): UseSyncReturn {
 
     if (!data.ok && data.errors) {
       console.error('Sync push errors:', data.errors)
+      throw new Error(data.errors.map(({ error }) => error).join('; '))
     }
 
     // Update local records with server IDs and clear dirty flag
@@ -212,9 +225,11 @@ export function useSync(): UseSyncReturn {
               const localModel = local as Category | Post
               if (shouldMatch(localModel, serverRecord, collection)) {
                 await localModel.update((model: Category | Post) => {
-                  model.serverId = serverRecord.serverId as string
-                  model.isDirty = false
-                  model.syncedAt = new Date()
+                  applyRecordToModel(
+                    model,
+                    serverRecord,
+                    collection as SyncableCollection
+                  )
                 })
                 break
               }
@@ -229,8 +244,11 @@ export function useSync(): UseSyncReturn {
             if (existing.length > 0) {
               const item = existing[0] as Category | Post
               await item.update((model: Category | Post) => {
-                model.isDirty = false
-                model.syncedAt = new Date()
+                applyRecordToModel(
+                  model,
+                  serverRecord,
+                  collection as SyncableCollection
+                )
               })
             }
           }
@@ -258,11 +276,11 @@ export function useSync(): UseSyncReturn {
         return
       }
 
-      // Pull first (get server changes)
-      await pull()
-
-      // Then push (send local changes)
+      // Push first so local dirty changes are not overwritten by pull.
       await push()
+
+      // Then pull the canonical server state back down.
+      await pull()
 
       setState(prev => ({ ...prev, status: 'success' }))
     } catch (error) {
@@ -292,11 +310,26 @@ export function useSync(): UseSyncReturn {
 function applyRecordToModel(
   model: Category | Post,
   record: SyncRecord,
-  collection: SyncableCollection
+  collection: SyncableCollection,
+  options?: { isNew?: boolean }
 ): void {
+  const serverUpdatedAt = getRecordTimestamp(record.server_updated_at)
+  const createdAt = getRecordTimestamp(record.created_at)
+
   model.serverId = record.serverId as string
+  model.serverUpdatedAt = serverUpdatedAt
   model.isDirty = false
   model.syncedAt = new Date()
+
+  if (options?.isNew && createdAt) {
+    setRawTimestamp(model, 'created_at', createdAt)
+  }
+
+  if (serverUpdatedAt) {
+    model.updatedAt = serverUpdatedAt
+    setRawTimestamp(model, 'updated_at', serverUpdatedAt)
+    setRawTimestamp(model, 'server_updated_at', serverUpdatedAt)
+  }
 
   if (collection === 'categories') {
     const cat = model as Category
@@ -334,12 +367,17 @@ async function upsertServerRecord(
 
   if (existing.length === 0) {
     await table.create((item: Model) => {
-      applyRecordToModel(item as SyncModel, record, collection)
+      applyRecordToModel(item as SyncModel, record, collection, { isNew: true })
     })
     return
   }
 
   const item = existing[0] as Category | Post
+
+  if (item.isDirty) {
+    return
+  }
+
   await item.update((model: Category | Post) => {
     applyRecordToModel(model, record, collection)
   })
@@ -355,6 +393,7 @@ function modelToSyncRecord(
   const base: SyncRecord = {
     id: model.id,
     serverId: model.serverId || undefined,
+    server_updated_at: model.serverUpdatedAt?.getTime() || null,
   }
 
   if (collection === 'categories') {
@@ -380,6 +419,26 @@ function modelToSyncRecord(
       published_at: post.publishedAt?.getTime() || null,
     }
   }
+}
+
+function getRecordTimestamp(value: unknown): Date | null {
+  if (typeof value !== 'number' || Number.isNaN(value)) {
+    return null
+  }
+
+  return new Date(value)
+}
+
+function setRawTimestamp(
+  model: Category | Post,
+  field: 'created_at' | 'updated_at' | 'server_updated_at',
+  value: Date
+): void {
+  const rawModel = model as unknown as {
+    _raw: Record<string, number | string | null | undefined>
+  }
+
+  rawModel._raw[field] = value.getTime()
 }
 
 /**

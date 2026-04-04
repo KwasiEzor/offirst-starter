@@ -45,28 +45,28 @@ Status: Partially complete
 
 ### Phase 2: Correct the Sync Protocol
 
-Status: Planned
+Status: In progress
 
-- [ ] Replace the current one-row-per-document sync log with append-only change events or an equivalent cursor-based approach.
-- [ ] Apply explicit conflict rules instead of the current “pull first and overwrite” behavior.
-- [ ] Persist and compare server and local update timestamps consistently.
-- [ ] Decide whether local-first edits should survive pull conflicts or whether the server must always win, then encode that in code and tests.
+- [x] Replace the current one-row-per-document sync log with append-only change events plus cursor-based incremental pulls.
+- [x] Apply an explicit sync rule so dirty local rows are not overwritten during pull, and sync pushes before it pulls.
+- [x] Persist and compare server and local update timestamps consistently.
+- [x] Decide whether local-first edits should survive pull conflicts or whether the server must always win, then encode that in code and tests.
 
 ### Phase 3: Reduce Client-Side Surface Area
 
-Status: Planned
+Status: In progress
 
-- [ ] Move as much of the authenticated shell back to server components as practical.
+- [x] Move as much of the authenticated shell back to server components as practical.
 - [ ] Keep only the database and sync boundaries client-side.
-- [ ] Remove redundant auth checks inside children already protected by the app layout.
-- [ ] Replace the hardcoded dashboard sync status with live data from sync state and local dirty counts.
+- [x] Remove redundant auth checks inside children already protected by the app layout.
+- [x] Replace the hardcoded dashboard sync status with live data from sync state and local dirty counts.
 
 ### Phase 4: Test the Real Contract
 
-Status: Planned
+Status: In progress
 
-- [ ] Add integration tests for pull and push route behavior.
-- [ ] Add tests for “create then update before pull”.
+- [x] Add integration tests for pull and push route behavior.
+- [x] Add tests for “create then update before pull”.
 - [ ] Add tests for missing-local-row upsert behavior.
 - [ ] Add tests for PWA/runtime caching exclusions where practical.
 
@@ -79,3 +79,14 @@ The first implementation pass is intentionally narrow:
 3. Harden sync application logic so server updates upsert locally instead of being ignored.
 
 This improves production safety immediately without forcing a full sync protocol redesign in one change.
+
+## Current Implementation Slice 2
+
+The second implementation pass hardens the sync protocol itself:
+
+1. Convert server sync logging from one-row-per-document to append-only events.
+2. Move incremental sync from timestamp-only pulls to event-ID cursoring.
+3. Preserve local dirty records during pull instead of overwriting them.
+4. Persist server update timestamps locally and reject stale pushes instead of overwriting newer server edits.
+5. Add tests around sync cursor parsing, timestamp conflict checks, and event reduction behavior.
+6. Add route-level tests for pull compaction and push conflict rejection.

@@ -17,17 +17,23 @@ export const migrations = schemaMigrations({
     // No migrations needed for v1, schema.ts handles initial setup
     //
     // Example migration for future reference:
-    // {
-    //   toVersion: 2,
-    //   steps: [
-    //     addColumns({
-    //       table: 'posts',
-    //       columns: [
-    //         { name: 'new_field', type: 'string', isOptional: true },
-    //       ],
-    //     }),
-    //   ],
-    // },
+    {
+      toVersion: 2,
+      steps: [
+        addColumns({
+          table: 'categories',
+          columns: [
+            { name: 'server_updated_at', type: 'number', isOptional: true },
+          ],
+        }),
+        addColumns({
+          table: 'posts',
+          columns: [
+            { name: 'server_updated_at', type: 'number', isOptional: true },
+          ],
+        }),
+      ],
+    },
   ],
 })
 

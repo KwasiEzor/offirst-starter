@@ -4,9 +4,12 @@ import {
   payloadToWatermelon,
   watermelonToPayload,
   shouldUseServerVersion,
+  hasServerConflict,
+  parseSyncCursor,
   generateTempId,
   isTempId,
   parseTimestamp,
+  serializeSyncCursor,
   formatTimestamp,
   SYNCABLE_COLLECTIONS,
 } from '../sync-utils'
@@ -53,6 +56,9 @@ describe('sync-utils', () => {
       expect(result.description).toBe('A test category')
       expect(result.color).toBe('#ff0000')
       expect(result.is_dirty).toBe(false)
+      expect(result.server_updated_at).toBe(
+        new Date('2024-01-02T00:00:00.000Z').getTime()
+      )
       expect(result.created_at).toBe(
         new Date('2024-01-01T00:00:00.000Z').getTime()
       )
@@ -201,6 +207,21 @@ describe('sync-utils', () => {
     })
   })
 
+  describe('hasServerConflict', () => {
+    it('should return true when server is newer than the client base', () => {
+      expect(hasServerConflict(1000, 2000)).toBe(true)
+    })
+
+    it('should return false when timestamps match', () => {
+      expect(hasServerConflict(2000, 2000)).toBe(false)
+    })
+
+    it('should return false when the client has no base timestamp', () => {
+      expect(hasServerConflict(null, 2000)).toBe(false)
+      expect(hasServerConflict(undefined, 2000)).toBe(false)
+    })
+  })
+
   describe('generateTempId', () => {
     it('should generate unique IDs', () => {
       const id1 = generateTempId()
@@ -239,6 +260,29 @@ describe('sync-utils', () => {
 
     it('should return 0 for null', () => {
       expect(parseTimestamp(null)).toBe(0)
+    })
+  })
+
+  describe('parseSyncCursor', () => {
+    it('should parse a numeric cursor', () => {
+      expect(parseSyncCursor('42')).toBe(42)
+    })
+
+    it('should return 0 for null or invalid values', () => {
+      expect(parseSyncCursor(null)).toBe(0)
+      expect(parseSyncCursor(undefined)).toBe(0)
+      expect(parseSyncCursor('abc')).toBe(0)
+      expect(parseSyncCursor('-2')).toBe(0)
+    })
+  })
+
+  describe('serializeSyncCursor', () => {
+    it('should serialize a positive cursor', () => {
+      expect(serializeSyncCursor(42)).toBe('42')
+    })
+
+    it('should clamp negative values to zero', () => {
+      expect(serializeSyncCursor(-10)).toBe('0')
     })
   })
 

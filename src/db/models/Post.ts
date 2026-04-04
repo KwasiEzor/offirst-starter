@@ -19,6 +19,7 @@ export default class Post extends Model {
 
   // Server sync fields
   @field('server_id') serverId!: string
+  @date('server_updated_at') serverUpdatedAt!: Date | null
   @field('is_dirty') isDirty!: boolean
   @date('synced_at') syncedAt!: Date | null
 
@@ -73,6 +74,7 @@ export default class Post extends Model {
   @writer async markSynced(serverId: string) {
     await this.update(record => {
       record.serverId = serverId
+      record.serverUpdatedAt = record.updatedAt
       record.isDirty = false
       record.syncedAt = new Date()
     })

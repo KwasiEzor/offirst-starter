@@ -1,32 +1,20 @@
-import { requireAuth } from '@/lib/auth'
+import SyncStatusCard from './SyncStatusCard'
+import UserGreeting from './UserGreeting'
+import UserRoleCard from './UserRoleCard'
 
-export default async function DashboardPage() {
-  const user = await requireAuth()
-
+export default function DashboardPage() {
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
           Dashboard
         </h1>
-        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-          Welcome back, {user.name || user.email}!
-        </p>
+        <UserGreeting />
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {/* Stats cards */}
-        <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-          <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
-            Sync Status
-          </h3>
-          <p className="mt-2 text-3xl font-semibold text-gray-900 dark:text-white">
-            Online
-          </p>
-          <p className="mt-1 text-sm text-green-600 dark:text-green-400">
-            All data synced
-          </p>
-        </div>
+        <SyncStatusCard />
 
         <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
           <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
@@ -40,17 +28,7 @@ export default async function DashboardPage() {
           </p>
         </div>
 
-        <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-          <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
-            Your Role
-          </h3>
-          <p className="mt-2 text-3xl font-semibold capitalize text-gray-900 dark:text-white">
-            {user.role}
-          </p>
-          <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-            {user.role === 'admin' ? 'Full access' : 'Standard access'}
-          </p>
-        </div>
+        <UserRoleCard />
       </div>
 
       {/* Quick actions */}

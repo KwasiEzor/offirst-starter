@@ -5,7 +5,8 @@
 
 // Types for sync operations
 export interface SyncPullRequest {
-  lastSyncedAt: string | null
+  cursor?: string | null
+  lastSyncedAt?: string | null
   collections: string[]
 }
 
@@ -17,6 +18,7 @@ export interface SyncPullResponse {
       deleted: string[]
     }
   }
+  cursor: string
   timestamp: string
 }
 
@@ -44,6 +46,7 @@ export interface SyncPushResponse {
 export interface SyncRecord {
   id: string
   serverId?: string
+  server_updated_at?: number | null
   [key: string]: unknown
 }
 
@@ -88,6 +91,7 @@ export function payloadToWatermelon(
     serverId: String(doc.id),
     created_at: new Date(doc.createdAt as string).getTime(),
     updated_at: new Date(doc.updatedAt as string).getTime(),
+    server_updated_at: new Date(doc.updatedAt as string).getTime(),
     synced_at: Date.now(),
     is_dirty: false,
   }
@@ -179,6 +183,45 @@ export function shouldUseServerVersion(
 ): boolean {
   // Server always wins in case of conflict
   return serverUpdatedAt >= localUpdatedAt
+}
+
+/**
+ * Detect whether the client is attempting to write against a stale server version.
+ */
+export function hasServerConflict(
+  clientBaseUpdatedAt: number | null | undefined,
+  currentServerUpdatedAt: number
+): boolean {
+  if (
+    typeof clientBaseUpdatedAt !== 'number' ||
+    Number.isNaN(clientBaseUpdatedAt)
+  ) {
+    return false
+  }
+
+  return currentServerUpdatedAt > clientBaseUpdatedAt
+}
+
+/**
+ * Parse a sync cursor into the last seen event ID
+ */
+export function parseSyncCursor(cursor: string | null | undefined): number {
+  if (!cursor) return 0
+
+  const parsed = Number.parseInt(cursor, 10)
+
+  if (!Number.isFinite(parsed) || parsed < 0) {
+    return 0
+  }
+
+  return parsed
+}
+
+/**
+ * Format a sync cursor for persistence and transport
+ */
+export function serializeSyncCursor(lastEventId: number): string {
+  return String(Math.max(0, Math.trunc(lastEventId)))
 }
 
 /**

@@ -5,12 +5,13 @@ import { appSchema, tableSchema } from '@nozbe/watermelondb'
  * Mirrors the Payload CMS collections that need offline support
  */
 export const schema = appSchema({
-  version: 1,
+  version: 2,
   tables: [
     tableSchema({
       name: 'categories',
       columns: [
         { name: 'server_id', type: 'string', isIndexed: true },
+        { name: 'server_updated_at', type: 'number', isOptional: true },
         { name: 'name', type: 'string' },
         { name: 'slug', type: 'string', isIndexed: true },
         { name: 'description', type: 'string', isOptional: true },
@@ -25,6 +26,7 @@ export const schema = appSchema({
       name: 'posts',
       columns: [
         { name: 'server_id', type: 'string', isIndexed: true },
+        { name: 'server_updated_at', type: 'number', isOptional: true },
         { name: 'title', type: 'string' },
         { name: 'slug', type: 'string', isIndexed: true },
         { name: 'excerpt', type: 'string', isOptional: true },

@@ -1,4 +1,4 @@
-import type { NextRequest} from 'next/server';
+import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 
 import { getPayloadClient } from '@/lib/payload'
@@ -7,6 +7,7 @@ import {
   type SyncPushResponse,
   type SyncError,
   isSyncableCollection,
+  hasServerConflict,
   watermelonToPayload,
   isTempId,
   payloadToWatermelon,
@@ -87,6 +88,30 @@ export async function POST(request: NextRequest) {
               collection,
               id: record.id,
               error: 'Cannot update record without server ID',
+            })
+            continue
+          }
+
+          const existing = await payload.findByID({
+            collection,
+            id: serverId,
+            depth: 0,
+            user: user.user,
+          })
+
+          const clientBaseUpdatedAt =
+            typeof record.server_updated_at === 'number'
+              ? record.server_updated_at
+              : null
+          const serverUpdatedAt = new Date(
+            existing.updatedAt as string
+          ).getTime()
+
+          if (hasServerConflict(clientBaseUpdatedAt, serverUpdatedAt)) {
+            errors.push({
+              collection,
+              id: record.id,
+              error: 'Conflict: server version changed since last sync',
             })
             continue
           }

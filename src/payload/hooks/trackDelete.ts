@@ -1,5 +1,6 @@
 import type { CollectionAfterDeleteHook } from 'payload'
-import { sql } from 'drizzle-orm'
+
+import { appendSyncLogEntry } from '@/lib/server/sync-log'
 
 /**
  * Hook factory that logs document deletions to sync_log table
@@ -13,17 +14,14 @@ export const trackDelete = (
     if (!req.payload.db) return doc
 
     try {
-      const timestamp = new Date().toISOString()
       const userId = req.user?.id ? String(req.user.id) : null
 
-      await req.payload.db.drizzle.execute(
-        sql`
-          INSERT INTO sync_log (collection, document_id, operation, timestamp, user_id)
-          VALUES (${collectionSlug}, ${String(doc.id)}, 'delete', ${timestamp}, ${userId})
-          ON CONFLICT (collection, document_id)
-          DO UPDATE SET operation = 'delete', timestamp = ${timestamp}, user_id = ${userId}
-        `
-      )
+      await appendSyncLogEntry(req.payload.db, {
+        collection: collectionSlug,
+        documentId: String(doc.id),
+        operation: 'delete',
+        userId,
+      })
     } catch (error) {
       // Log but don't fail the operation
       req.payload.logger.error({
