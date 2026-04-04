@@ -54,21 +54,21 @@ Status: In progress
 
 ### Phase 3: Reduce Client-Side Surface Area
 
-Status: In progress
+Status: Complete
 
 - [x] Move as much of the authenticated shell back to server components as practical.
-- [ ] Keep only the database and sync boundaries client-side.
+- [x] Keep only the database and sync boundaries client-side.
 - [x] Remove redundant auth checks inside children already protected by the app layout.
 - [x] Replace the hardcoded dashboard sync status with live data from sync state and local dirty counts.
 
 ### Phase 4: Test the Real Contract
 
-Status: In progress
+Status: Complete
 
 - [x] Add integration tests for pull and push route behavior.
 - [x] Add tests for “create then update before pull”.
 - [x] Add tests for missing-local-row upsert behavior.
-- [ ] Add tests for PWA/runtime caching exclusions where practical.
+- [x] Add tests for PWA/runtime caching exclusions where practical.
 
 ## Current Implementation Slice
 
@@ -91,3 +91,5 @@ The second implementation pass hardens the sync protocol itself:
 5. Add tests around sync cursor parsing, timestamp conflict checks, and event reduction behavior.
 6. Add route-level tests for pull compaction and push conflict rejection.
 7. Add client-side sync helper coverage for missing-local-row upserts and dirty-row preservation.
+8. Remove the extra client-side user context so only database and sync boundaries stay on the client.
+9. Add regression coverage for the PWA runtime caching allowlist.

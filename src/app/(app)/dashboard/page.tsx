@@ -1,15 +1,23 @@
+import { getPayloadUser } from '@/lib/auth'
+
 import SyncStatusCard from './SyncStatusCard'
 import UserGreeting from './UserGreeting'
 import UserRoleCard from './UserRoleCard'
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const user = await getPayloadUser()
+
+  if (!user) {
+    throw new Error('DashboardPage rendered without an authenticated user')
+  }
+
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
           Dashboard
         </h1>
-        <UserGreeting />
+        <UserGreeting user={user} />
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -28,7 +36,7 @@ export default function DashboardPage() {
           </p>
         </div>
 
-        <UserRoleCard />
+        <UserRoleCard user={user} />
       </div>
 
       {/* Quick actions */}

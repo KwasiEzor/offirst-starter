@@ -1,10 +1,10 @@
-'use client'
+import type { AuthUser } from '@/lib/auth'
 
-import { useCurrentUser } from '@/components/providers'
+interface UserRoleCardProps {
+  user: AuthUser
+}
 
-export default function UserRoleCard() {
-  const user = useCurrentUser()
-
+export default function UserRoleCard({ user }: UserRoleCardProps) {
   return (
     <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
       <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">

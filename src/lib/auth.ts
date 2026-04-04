@@ -2,6 +2,7 @@
  * Server-side auth utilities
  * These functions use next/headers and can only be used in Server Components
  */
+import { cache } from 'react'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 
@@ -17,7 +18,7 @@ export type { AuthUser }
  *
  * @returns The authenticated user or null
  */
-export async function getPayloadUser(): Promise<AuthUser | null> {
+const getPayloadUserCached = cache(async (): Promise<AuthUser | null> => {
   try {
     const payload = await getPayloadClient()
     const headersList = await headers()
@@ -46,6 +47,10 @@ export async function getPayloadUser(): Promise<AuthUser | null> {
     console.error('Auth error:', error)
     return null
   }
+})
+
+export async function getPayloadUser(): Promise<AuthUser | null> {
+  return getPayloadUserCached()
 }
 
 /**

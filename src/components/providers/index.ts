@@ -10,5 +10,3 @@ export {
   useSyncStatus,
   useIsOnline,
 } from './SyncProvider'
-
-export { UserProvider, useCurrentUser } from './UserProvider'
